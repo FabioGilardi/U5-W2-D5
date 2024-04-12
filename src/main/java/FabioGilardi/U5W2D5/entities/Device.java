@@ -30,4 +30,9 @@ public class Device {
         this.status = status;
         this.employee = employee;
     }
+
+    public Device(String type, String status) {
+        this.type = type;
+        this.status = status;
+    }
 }

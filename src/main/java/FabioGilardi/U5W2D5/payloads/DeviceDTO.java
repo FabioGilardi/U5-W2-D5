@@ -7,8 +7,6 @@ public record DeviceDTO(
         String type,
 
         @NotEmpty(message = "status is mandatory")
-        String status,
-
-        long employeeId
+        String status
 ) {
 }

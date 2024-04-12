@@ -43,6 +43,7 @@ public class DeviceService {
             Device found = this.findById(id);
             found.setType(payload.type());
             found.setStatus(payload.status());
+            found.setEmployee(null);
             deviceDAO.save(found);
             return found;
         } else throw new BadRequestException("Device cannot be created as assigned in type");

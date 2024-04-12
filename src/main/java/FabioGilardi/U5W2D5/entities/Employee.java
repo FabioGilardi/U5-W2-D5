@@ -29,13 +29,12 @@ public class Employee {
 
 
     //  CONSTRUCTOR
-    public Employee(String username, String name, String surname, String email, List<Device> deviceList) {
+    public Employee(String username, String name, String surname, String email) {
         this.username = username;
         this.name = name;
         this.surname = surname;
         this.email = email;
         setDeafaultAvatar();
-        this.deviceList = deviceList;
     }
 
     //    METHODS

@@ -41,15 +41,23 @@ public class EmployeeService {
         return employeeDAO.findById(id).orElseThrow(() -> new NotFoundException(id));
     }
 
+    //    HO DATO ALL'UTENTE LA POSSIBILITA' DI POTER CAMBIARE TUTTO TRANNE LA MAIL. IN CASO LO USERNAME DEL PAYLOAD SIA UGUALE A QUELLO DEL FOUND BYPASSA I CONTROLLI DELLA QUERY ALTRIMENTI MI BLOCCHEREBBE L'OPERAZIONE PER IL FATTO CHE IL FOUND è UGUALE A SE STESSO
     public Employee findByIdAndUpdate(long id, EmployeeDTO payload) {
         Employee found = this.findById(id);
-        found.setUsername(payload.username());
-        found.setName(payload.name());
-        found.setSurname(payload.surname());
-        found.setEmail(payload.email());
-        if (!found.getAvatar().contains("cloudinary")) found.setDeafaultAvatar();
-        employeeDAO.save(found);
-        return found;
+        if (found.getEmail().equals(payload.email())) {
+            if (found.getUsername().equals(payload.username())) {
+                found.setName(payload.name());
+                found.setSurname(payload.surname());
+                if (!found.getAvatar().contains("cloudinary")) found.setDeafaultAvatar();
+            } else if (!employeeDAO.existsByUsername(payload.username())) {
+                found.setUsername(payload.username());
+                found.setName(payload.name());
+                found.setSurname(payload.surname());
+                if (!found.getAvatar().contains("cloudinary")) found.setDeafaultAvatar();
+            } else throw new BadRequestException("Username " + payload.username() + " is already taken");
+            employeeDAO.save(found);
+            return found;
+        } else throw new BadRequestException("You are not allowed to change the email");
     }
 
     public void findByIdAndDelete(long id) {

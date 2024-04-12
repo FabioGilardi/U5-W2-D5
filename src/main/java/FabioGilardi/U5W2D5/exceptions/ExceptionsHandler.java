@@ -20,7 +20,7 @@ public class ExceptionsHandler {
     @ExceptionHandler(BadRequestException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     private ErrorDTO BadRequestExcpetionHandler(BadRequestException ex) {
-        if (ex.getErrorList().isEmpty()) {
+        if (ex.getErrorList() == null) {
             return new ErrorDTO(ex.getMessage(), LocalDateTime.now());
         } else {
             String message = ex.getErrorList().stream().map(objectError -> objectError.getDefaultMessage()).collect(Collectors.joining("! "));

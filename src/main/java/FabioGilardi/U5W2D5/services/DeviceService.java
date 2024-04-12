@@ -5,6 +5,7 @@ import FabioGilardi.U5W2D5.exceptions.BadRequestException;
 import FabioGilardi.U5W2D5.exceptions.NotFoundException;
 import FabioGilardi.U5W2D5.payloads.DeviceAssignementDTO;
 import FabioGilardi.U5W2D5.payloads.DeviceDTO;
+import FabioGilardi.U5W2D5.payloads.NewDeciveDTO;
 import FabioGilardi.U5W2D5.repositories.DeviceDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -27,26 +28,26 @@ public class DeviceService {
         return deviceDAO.findAll(pageable);
     }
 
-    public Device save(DeviceDTO payload) {
-        if (!payload.status().toLowerCase().equals("assigned")) {
-            Device newDevice = new Device(payload.type(), payload.status());
-            return deviceDAO.save(newDevice);
-        } else throw new BadRequestException("Device cannot be created as assigned in type");
+    public Device save(NewDeciveDTO payload) {
+        Device newDevice = new Device(payload.type());
+        newDevice.setStatus("Available");
+        return deviceDAO.save(newDevice);
     }
 
     public Device findById(long id) {
         return deviceDAO.findById(id).orElseThrow(() -> new NotFoundException(id));
     }
 
-    public Device findByIdAndUpdate(long id, DeviceDTO payload) {
+    //    DO SOLO LA POSSIBILITA' DI MODIFICARE LO STATO IN QUANTO UN PC NON POTRA' MAI ESSERE RICONVERTITO IN UNO
+    // SMARTPHONE E VICEVERSA(QUALSIASI ALTRO DISPOSITIVO IN GENERALE)
+    public Device findByIdAndUpdateStatus(long id, DeviceDTO payload) {
         if (!payload.status().toLowerCase().equals("assigned")) {
             Device found = this.findById(id);
-            found.setType(payload.type());
             found.setStatus(payload.status());
             found.setEmployee(null);
             deviceDAO.save(found);
             return found;
-        } else throw new BadRequestException("Device cannot be created as assigned in type");
+        } else throw new BadRequestException("Device cannot be updated as assigned in type");
     }
 
     public void findByIdAndDelete(long id) {
@@ -54,11 +55,14 @@ public class DeviceService {
         deviceDAO.delete(found);
     }
 
+    // DO LA POSSIBILITA' DI ASSEGNARE UN DISPOSITIVO SONO NEL CASO QUESTO SIA AVAILABLE O ANCHE GIA' ASSEGNATO AD UN ALTRO UTENTE, PERCHE' HO PENSATO CHE IN CASO DI UNA RAPIDA RIASSEGNAZIONE FOSSE COMODO IL PASSAGGIO DA UN UTENTE AD UN ALTRO ALTRO SENZA PASSARE PER LO STATO AVAILABLE (SEMPRE PER POSSIBILI IMPREVISTI VARI)
     public Device findByIdAndAssign(long id, DeviceAssignementDTO payload) {
         Device found = this.findById(id);
-        found.setStatus("assigned");
-        found.setEmployee(employeeService.findById(payload.employeeId()));
-        deviceDAO.save(found);
-        return found;
+        if (found.getStatus().toLowerCase().equals("available") || found.getStatus().toLowerCase().equals("assigned")) {
+            found.setStatus("Assigned");
+            found.setEmployee(employeeService.findById(payload.employeeId()));
+            deviceDAO.save(found);
+            return found;
+        } else throw new BadRequestException("Device is currently " + found.getStatus());
     }
 }

@@ -35,4 +35,8 @@ public class Device {
         this.type = type;
         this.status = status;
     }
+
+    public Device(String type) {
+        this.type = type;
+    }
 }

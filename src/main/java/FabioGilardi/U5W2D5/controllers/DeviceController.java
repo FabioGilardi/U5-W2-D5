@@ -4,6 +4,7 @@ import FabioGilardi.U5W2D5.entities.Device;
 import FabioGilardi.U5W2D5.exceptions.BadRequestException;
 import FabioGilardi.U5W2D5.payloads.DeviceAssignementDTO;
 import FabioGilardi.U5W2D5.payloads.DeviceDTO;
+import FabioGilardi.U5W2D5.payloads.NewDeciveDTO;
 import FabioGilardi.U5W2D5.services.DeviceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -26,7 +27,7 @@ public class DeviceController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    private Device save(@RequestBody @Validated DeviceDTO payload, BindingResult validation) {
+    private Device save(@RequestBody @Validated NewDeciveDTO payload, BindingResult validation) {
         if (validation.hasErrors()) {
             throw new BadRequestException(validation.getAllErrors());
         }
@@ -43,7 +44,7 @@ public class DeviceController {
         if (validation.hasErrors()) {
             throw new BadRequestException(validation.getAllErrors());
         }
-        return deviceService.findByIdAndUpdate(id, payload);
+        return deviceService.findByIdAndUpdateStatus(id, payload);
     }
 
     @DeleteMapping("/{id}")

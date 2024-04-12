@@ -27,6 +27,8 @@ public class Employee {
     @JsonIgnore
     private List<Device> deviceList;
 
+
+    //  CONSTRUCTOR
     public Employee(String username, String name, String surname, String email, List<Device> deviceList) {
         this.username = username;
         this.name = name;
@@ -36,6 +38,7 @@ public class Employee {
         this.deviceList = deviceList;
     }
 
+    //    METHODS
     public void setDeafaultAvatar() {
         this.avatar = "https://ui-avatars.com/api/?name=" + this.name + "+" + this.surname;
     }

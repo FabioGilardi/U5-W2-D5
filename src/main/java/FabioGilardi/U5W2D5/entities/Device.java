@@ -24,6 +24,7 @@ public class Device {
     @JoinColumn(name = "employee_id")
     private Employee employee;
 
+    //    CONSTRUCTOR
     public Device(String type, String status, Employee employee) {
         this.type = type;
         this.status = status;

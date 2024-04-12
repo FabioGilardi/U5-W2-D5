@@ -57,7 +57,7 @@ public class EmployeeService {
             } else throw new BadRequestException("Username " + payload.username() + " is already taken");
             employeeDAO.save(found);
             return found;
-        } else throw new BadRequestException("You are not allowed to change the email");
+        } else throw new BadRequestException("You are not allowed to change the email without permission");
     }
 
     public void findByIdAndDelete(long id) {

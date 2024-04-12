@@ -5,16 +5,23 @@ import FabioGilardi.U5W2D5.exceptions.BadRequestException;
 import FabioGilardi.U5W2D5.exceptions.NotFoundException;
 import FabioGilardi.U5W2D5.payloads.EmployeeDTO;
 import FabioGilardi.U5W2D5.repositories.EmployeeDAO;
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @Service
 public class EmployeeService {
 
+    @Autowired
+    private Cloudinary cloudinaryUploader;
     @Autowired
     private EmployeeDAO employeeDAO;
 
@@ -35,22 +42,26 @@ public class EmployeeService {
     }
 
     public Employee findByIdAndUpdate(long id, EmployeeDTO payload) {
-        if (!employeeDAO.existsByEmail(payload.email()) && !employeeDAO.existsByUsername(payload.username())) {
-            Employee found = this.findById(id);
-            found.setUsername(payload.username());
-            found.setName(payload.name());
-            found.setSurname(payload.surname());
-            found.setEmail(payload.email());
-            found.setDeafaultAvatar();
-            employeeDAO.save(found);
-            return found;
-        } else {
-            throw new BadRequestException("email/username has been already taken");
-        }
+        Employee found = this.findById(id);
+        found.setUsername(payload.username());
+        found.setName(payload.name());
+        found.setSurname(payload.surname());
+        found.setEmail(payload.email());
+        if (!found.getAvatar().contains("cloudinary")) found.setDeafaultAvatar();
+        employeeDAO.save(found);
+        return found;
     }
 
     public void findByIdAndDelete(long id) {
         Employee found = this.findById(id);
         employeeDAO.delete(found);
+    }
+
+    public Employee uploadImage(MultipartFile img, long blogPostId) throws IOException {
+        Employee found = findById(blogPostId);
+        String url = (String) cloudinaryUploader.uploader().upload(img.getBytes(), ObjectUtils.emptyMap()).get("url");
+        found.setAvatar(url);
+        employeeDAO.save(found);
+        return found;
     }
 }
